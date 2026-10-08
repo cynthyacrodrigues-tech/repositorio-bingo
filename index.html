@@ -1,0 +1,1100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f4ee">
+  <title>Bingo do EPI - Sucal Mineração</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --paper: #081a1d;
+      --panel: #0d242d;
+      --panel-soft: #102b35;
+      --ink: #eaf8ff;
+      --muted: #9cc0cb;
+      --green: #1a8f6d;
+      --green-dark: #0d5d4d;
+      --blue: #123c5d;
+      --blue-deep: #0a2738;
+      --lime: #7ef2d2;
+      --orange: #8dc8ff;
+      --line: rgba(156, 192, 203, 0.2);
+      --white: #eafaf9;
+      --shadow: 0 22px 56px rgba(3, 17, 21, 0.38);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(18, 60, 93, 0.8), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(26, 143, 109, 0.35), transparent 30%),
+        linear-gradient(135deg, #081a1d 0%, #0b2230 42%, #0d2f3d 100%);
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    }
+    button, select, input { font: inherit; }
+    .hidden { display: none !important; }
+    .app-shell {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 30px 0 48px;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--green-dark);
+    }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--lime);
+      color: var(--green-dark);
+      font-family: Georgia, serif;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+    .top-count {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .intro {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+    h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(42px, 6vw, 66px);
+      font-weight: 500;
+      line-height: 0.98;
+    }
+    h1 span { color: var(--green); }
+    .round-label {
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .lobby-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 16px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(16, 43, 53, 0.95), rgba(10, 39, 56, 0.92));
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+    .panel h2 { margin: 0 0 10px; font-size: 20px; }
+    .panel p { margin: 0; color: var(--muted); line-height: 1.5; font-size: 14px; }
+    .panel h2 { color: #f4fbff; }
+    .form-stack {
+      display: grid;
+      gap: 14px;
+      margin-top: 20px;
+    }
+    .field {
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    input, select {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: white;
+      padding: 10px 12px;
+      color: #000000;
+      font-size: 14px;
+    }
+    .primary-button, .secondary-button, .share-button {
+      min-height: 48px;
+      border: 0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 900;
+      transition: transform 150ms ease, opacity 150ms ease, background-color 150ms ease;
+    }
+    .primary-button {
+      background: linear-gradient(135deg, var(--green), #3bb79c);
+      color: white;
+    }
+    .primary-button:hover:not(:disabled) { background: linear-gradient(135deg, #25b98d, var(--green-dark)); transform: translateY(-1px); }
+    .secondary-button {
+      background: #eef1eb;
+      color: var(--green-dark);
+      border: 1px solid var(--line);
+    }
+    .qr-box {
+      display: grid;
+      place-items: center;
+      width: min(72vw, 260px);
+      height: min(72vw, 260px);
+      margin: 16px auto 0;
+      padding: 14px;
+      border-radius: 16px;
+      background: white;
+      border: 2px solid rgba(13, 93, 77, 0.2);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+    }
+    .qr-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .qr-inline-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .qr-toggle {
+      background: var(--green-dark);
+      color: white;
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .qr-modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(10, 23, 28, 0.72);
+      padding: 24px;
+      z-index: 30;
+    }
+    .qr-modal.hidden {
+      display: none;
+    }
+    .qr-modal-card {
+      width: min(92vw, 440px);
+      background: linear-gradient(180deg, #f6faf7 0%, #edf5ee 100%);
+      border-radius: 22px;
+      padding: 22px 20px 18px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.24);
+      border: 1px solid var(--line);
+      text-align: center;
+    }
+    .qr-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .qr-modal-card h2 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    .qr-close {
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--green-dark);
+    }
+    .qr-large {
+      width: min(72vw, 300px);
+      height: min(72vw, 300px);
+      margin: 18px auto;
+    }
+    .share-button {
+      background: transparent;
+      color: var(--green-dark);
+      border: 1px solid var(--line);
+      min-height: 40px;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+    .primary-button:disabled, .secondary-button:disabled { opacity: 0.55; cursor: not-allowed; }
+    .form-status {
+      min-height: 22px;
+      color: #a6422d;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+    .room-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 16px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--white);
+    }
+    .room-code {
+      color: var(--green-dark);
+      font-size: clamp(18px, 3vw, 28px);
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      line-height: 1.2;
+    }
+    .room-people {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .room-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.8fr);
+      gap: 22px;
+      align-items: start;
+    }
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      padding: 6px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+    }
+    .tile {
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      aspect-ratio: 1.2;
+      padding: 8px 6px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f7f8f5;
+      color: #000000;
+      font-size: 11px;
+      font-weight: 800;
+      text-align: center;
+      overflow-wrap: anywhere;
+      line-height: 1.2;
+      min-height: 54px;
+    }
+    .tile.selected {
+      background: linear-gradient(135deg, var(--green), #3bb79c);
+      color: white;
+      border-color: rgba(255,255,255,0.2);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+    }
+    .tile.selected::after {
+      content: "✓";
+      display: grid;
+      place-items: center;
+      width: 18px;
+      height: 18px;
+      margin-top: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      color: white;
+      font-size: 12px;
+    }
+    .count-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .editor-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 16px 0 20px;
+      max-height: 430px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+    .selection-preview {
+      margin-top: 14px;
+    }
+      margin: 14px 0 18px;
+      padding-top: 2px;
+    }
+    .preview-header {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .choice-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8f9f5;
+      color: #000000;
+      min-height: 58px;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.4;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+    }
+    .choice-item.selected {
+      background: linear-gradient(135deg, var(--green), #3bb79c);
+      color: white;
+      border-color: rgba(255,255,255,0.18);
+    }
+    .draw-panel {
+      background: linear-gradient(180deg, rgba(10, 39, 56, 1), rgba(12, 54, 69, 1));
+      color: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+      border: 1px solid rgba(126, 242, 210, 0.18);
+    }
+    .draw-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: #cfe2d7;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .drawn-item {
+      min-height: 120px;
+      margin: 12px 0 16px;
+      border-radius: 6px;
+      background: rgb(255 255 255 / 6%);
+      border: 1px solid rgb(255 255 255 / 16%);
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 28px;
+      line-height: 1.08;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+    .drawn-item.empty { color: #c2d3c9; font-size: 20px; }
+    .draw-panel .status {
+      margin: 0;
+      min-height: 24px;
+      color: #e0ece3;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .draw-panel .status.won { color: var(--lime); font-weight: 900; }
+    .history-wrap {
+      display: grid;
+      gap: 8px;
+      margin-top: 18px;
+    }
+    .history-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: #e0ece3;
+    }
+    .history {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 180px;
+      overflow: auto;
+    }
+    .history-item {
+      border: 1px solid rgb(255 255 255 / 18%);
+      color: #edf3ef;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      line-height: 1.2;
+    }
+    .history-item:last-child { border-color: var(--lime); color: var(--lime); }
+    .roster {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      max-height: 280px;
+      overflow: auto;
+    }
+    .roster-item {
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 10px 12px;
+      background: #f7f8f5;
+      font-size: 14px;
+      font-weight: 700;
+      color: #000000;
+    }
+    .roster-item.winner {
+      border-color: var(--green);
+      background: #ebf4df;
+    }
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .toolbar > * { flex: 1; }
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid var(--orange);
+      outline-offset: 2px;
+    }
+    @media (max-width: 760px) {
+      .app-shell { width: min(100% - 20px, 560px); }
+      .lobby-grid, .room-layout { grid-template-columns: 1fr; }
+      .intro { flex-direction: column; align-items: flex-start; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .toolbar { flex-direction: column; }
+      .editor-grid { grid-template-columns: 1fr; }
+      .choice-item { font-size: 14px; min-height: 62px; }
+      .qr-box { width: min(72vw, 280px); height: min(72vw, 280px); }
+      .room-code { letter-spacing: 0.08em; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">EPI</span><span>Sucal Mineração</span></div>
+      <div class="top-count">Até 40 participantes</div>
+    </header>
+
+    <section class="intro" aria-labelledby="page-title">
+      <h1 id="page-title">Bingo do EPI – Sucal Mineração</h1>
+      <div class="round-label">Segurança no trabalho</div>
+    </section>
+
+    <section id="lobby-view">
+      <div class="lobby-grid">
+        <section class="panel">
+          <h2>Criar sala</h2>
+          <p>Crie uma partida e compartilhe o código com os participantes.</p>
+          <form id="create-form" class="form-stack">
+            <label class="field" for="host-name">Nome do organizador
+              <input id="host-name" maxlength="30" required>
+            </label>
+            <p>Vencedor: linha horizontal/vertical ou cartela cheia.</p>
+            <button class="primary-button" type="submit">Criar partida</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Entrar na sala</h2>
+          <p>Digite apenas seu nome e entre na partida.</p>
+          <form id="join-form" class="form-stack">
+            <label class="field" for="player-name">Seu nome
+              <input id="player-name" maxlength="30" required>
+            </label>
+            <label id="join-code-field" class="field" for="join-code">Código da sala
+              <input id="join-code" maxlength="6" autocapitalize="characters">
+            </label>
+            <button class="primary-button" type="submit">Entrar na partida</button>
+          </form>
+        </section>
+      </div>
+      <div id="lobby-status" class="form-status" role="status"></div>
+    </section>
+
+    <section id="selection-view" class="hidden">
+      <div class="panel">
+        <div class="count-line">
+          <strong>Escolha sua cartela</strong>
+          <span id="selected-count">0 / 16</span>
+        </div>
+        <div id="choice-grid" class="editor-grid" aria-label="Lista de EPIs"></div>
+        <div id="selection-preview" class="selection-preview hidden" aria-live="polite">
+          <div class="preview-header">Pré-visualização da cartela</div>
+          <div id="preview-grid" class="board-grid" aria-label="Cartela vista previa"></div>
+        </div>
+        <div class="toolbar">
+          <button id="save-card" class="primary-button" type="button">Salvar cartela</button>
+          <button id="leave-room" class="secondary-button" type="button">Sair da sala</button>
+        </div>
+        <div id="selection-status" class="form-status"></div>
+      </div>
+    </section>
+
+    <section id="host-view" class="hidden">
+      <div class="room-top">
+        <div>
+          <div class="top-count">Código da sala</div>
+          <div id="room-code" class="room-code"></div>
+        </div>
+        <div id="room-people" class="room-people"></div>
+        <button id="share-room" class="share-button" type="button">Copiar link da sala</button>
+      </div>
+
+      <div class="panel" style="margin-bottom: 18px;">
+        <h2>Escaneie o QR Code</h2>
+        <p>Os participantes podem entrar diretamente pelo celular usando o QR Code da sala.</p>
+        <div id="qr-code-box" class="qr-box" aria-live="polite"></div>
+        <div class="qr-inline-actions">
+          <button id="open-qr-screen" class="qr-toggle" type="button">Abrir tela separada</button>
+        </div>
+      </div>
+
+      <div class="room-layout">
+        <div class="panel">
+          <h2>Participantes</h2>
+          <div id="roster" class="roster"></div>
+        </div>
+
+        <aside class="draw-panel">
+          <div class="draw-meta">
+            <span id="draw-number">Sorteio 0 / 30</span>
+            <span>Sem repetição</span>
+          </div>
+          <div id="drawn-item" class="drawn-item empty">Aguardando partida</div>
+          <div class="toolbar">
+            <button id="start-game" class="primary-button" type="button">Iniciar partida</button>
+            <button id="draw-next" class="primary-button hidden" type="button">Sortear próximo EPI</button>
+          </div>
+          <p id="game-status" class="status">Aguardando todos escolherem a cartela.</p>
+          <div class="history-wrap">
+            <div class="history-title"><span>Itens sorteados</span><span id="remaining-count">30 restantes</span></div>
+            <div id="history" class="history"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="player-view" class="hidden">
+      <div class="room-top">
+        <div>
+          <div class="top-count">Código da sala</div>
+          <div id="player-room-code" class="room-code"></div>
+        </div>
+        <div id="player-room-people" class="room-people"></div>
+      </div>
+
+      <div class="room-layout">
+        <div class="panel">
+          <h2>Sua cartela</h2>
+          <div id="player-board" class="board-grid" aria-label="Cartela do jogador"></div>
+          <div class="count-line">
+            <span>Cartela marcada</span>
+            <span id="board-count">0 / 16</span>
+          </div>
+        </div>
+
+        <aside class="draw-panel">
+          <div class="draw-meta">
+            <span id="player-draw-number">Sorteio 0 / 30</span>
+            <span>Sem repetição</span>
+          </div>
+          <div id="player-drawn-item" class="drawn-item empty">Aguardando sorteio</div>
+          <p id="player-status" class="status">Aguardando o início da partida.</p>
+          <div class="history-wrap">
+            <div class="history-title"><span>Itens sorteados</span><span id="player-remaining-count">30 restantes</span></div>
+            <div id="player-history" class="history"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <div id="qr-modal" class="qr-modal hidden" aria-hidden="true">
+    <div class="qr-modal-card">
+      <div class="qr-modal-header">
+        <h2>QR Code da sala</h2>
+        <button id="close-qr-modal" class="qr-close" type="button">Fechar</button>
+      </div>
+      <div id="qr-modal-box" class="qr-box qr-large" aria-live="polite"></div>
+      <div id="qr-modal-room-code" class="room-code"></div>
+    </div>
+  </div>
+
+  <script>
+    const EPI_ITEMS = [
+      'CAPACETE DE SEGURANÇA',
+      'ÓCULOS INCOLOR',
+      'ÓCULOS PRETO',
+      'PROTETOR FACIAL',
+      'MÁSCARA DE SOLDA',
+      'PROTETOR AURICULAR TIPO PLUG',
+      'PROTETOR AURICULAR TIPO CONCHA',
+      'MÁSCARA PFF2',
+      'LUVA DE RASPA',
+      'LUVA DE VAQUETA',
+      'LUVA NITRÍLICA',
+      'LUVA DE LÁTEX',
+      'BOTINA',
+      'PERNEIRA',
+      'BOTINA DE COMPOSITE',
+      'AVENTAL BARBEIRO',
+      'AVENTAL VINIL',
+      'MACACÃO DE PROTEÇÃO QUÍMICA',
+      'JALECO',
+      'PROTETOR SOLAR (PROTEÇÃO CONTRA RAIOS UV)',
+      'BONÉ CASQUETE',
+      'CAPA DE CHUVA',
+      'CAPUZ BALACLAVA',
+      'CORRETOR POSTURAL',
+      'CINTO ELETRICISTA',
+      'JUGULAR PARA CAPACETE 3M',
+      'TRAVA QUEDAS',
+      'BOTA EMBORRACHADA',
+      'BOTINA PVC',
+      'BOTINA COMPOSITE'
+    ];
+
+    const lobbyView = document.getElementById('lobby-view');
+    const selectionView = document.getElementById('selection-view');
+    const hostView = document.getElementById('host-view');
+    const playerView = document.getElementById('player-view');
+    const selectedCount = document.getElementById('selected-count');
+    const choiceGrid = document.getElementById('choice-grid');
+    const selectionStatus = document.getElementById('selection-status');
+    const lobbyStatus = document.getElementById('lobby-status');
+    const roomCodeEl = document.getElementById('room-code');
+    const roomPeopleEl = document.getElementById('room-people');
+    const rosterEl = document.getElementById('roster');
+    const gameStatus = document.getElementById('game-status');
+    const drawNumberEl = document.getElementById('draw-number');
+    const remainingCountEl = document.getElementById('remaining-count');
+    const historyEl = document.getElementById('history');
+    const drawnItemEl = document.getElementById('drawn-item');
+    const startGameButton = document.getElementById('start-game');
+    const drawNextButton = document.getElementById('draw-next');
+    const createForm = document.getElementById('create-form');
+    const joinForm = document.getElementById('join-form');
+    const playerRoomCodeEl = document.getElementById('player-room-code');
+    const playerRoomPeopleEl = document.getElementById('player-room-people');
+    const playerBoard = document.getElementById('player-board');
+    const playerDrawNumberEl = document.getElementById('player-draw-number');
+    const playerRemainingCountEl = document.getElementById('player-remaining-count');
+    const playerHistoryEl = document.getElementById('player-history');
+    const playerPlayedItemEl = document.getElementById('player-drawn-item');
+    const playerStatus = document.getElementById('player-status');
+    const boardCountEl = document.getElementById('board-count');
+    const selectionPreview = document.getElementById('selection-preview');
+    const previewGrid = document.getElementById('preview-grid');
+
+    let session = null;
+    let state = null;
+    let eventSource = null;
+    let selectedItems = [];
+
+    async function getShareLink(roomCode) {
+      const url = new URL('/', window.location.origin);
+      url.searchParams.set('room', roomCode);
+      return url.toString();
+    }
+
+    async function renderQrCode(roomCode, targetId = 'qr-code-box') {
+      const box = document.getElementById(targetId);
+      if (!box) return;
+      const url = await getShareLink(roomCode);
+      const qrImage = await fetch(`/api/qr?text=${encodeURIComponent(url)}`)
+        .then((response) => response.blob())
+        .then((blob) => URL.createObjectURL(blob));
+      box.innerHTML = `<img alt="QR Code da sala" src="${qrImage}" />`;
+      const modalRoomCode = document.getElementById('qr-modal-room-code');
+      if (modalRoomCode && targetId === 'qr-modal-box') {
+        modalRoomCode.textContent = roomCode;
+      }
+    }
+
+    function renderPreviewCard(items) {
+      const values = Array.from({ length: 16 }, (_, index) => items[index] || '');
+      previewGrid.innerHTML = '';
+      values.forEach((item) => {
+        const tile = document.createElement('div');
+        tile.className = 'tile selected';
+        tile.textContent = item || '—';
+        previewGrid.appendChild(tile);
+      });
+      selectionPreview.classList.toggle('hidden', values.every((item) => !item));
+    }
+
+    function setSelectedItems(items) {
+      selectedItems = [...items];
+      const unique = [...new Set(selectedItems)];
+      selectedCount.textContent = `${unique.length} / 16`;
+      renderChoices();
+      renderPreviewCard(unique);
+    }
+
+    function renderChoices() {
+      choiceGrid.innerHTML = '';
+      EPI_ITEMS.forEach((item) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `choice-item${selectedItems.includes(item) ? ' selected' : ''}`;
+        button.textContent = item;
+        button.addEventListener('click', () => toggleItem(item));
+        choiceGrid.appendChild(button);
+      });
+    }
+
+    function toggleItem(item) {
+      if (selectedItems.includes(item)) {
+        selectedItems = selectedItems.filter((value) => value !== item);
+      } else {
+        if (selectedItems.length >= 16) {
+          selectionStatus.textContent = 'Você já selecionou 16 EPIs. Remova um antes de adicionar outro.';
+          return;
+        }
+        selectedItems.push(item);
+      }
+      selectionStatus.textContent = '';
+      setSelectedItems(selectedItems);
+    }
+
+    function renderBoard(card, drawnSet) {
+      const values = Array.isArray(card) ? card : [];
+      playerBoard.innerHTML = '';
+      values.forEach((item) => {
+        const tile = document.createElement('div');
+        tile.className = `tile${drawnSet.has(item) ? ' selected' : ''}`;
+        tile.textContent = item;
+        playerBoard.appendChild(tile);
+      });
+      const count = values.filter((item) => drawnSet.has(item)).length;
+      boardCountEl.textContent = `${count} / 16`;
+    }
+
+    function renderRoster(players) {
+      rosterEl.innerHTML = '';
+      players.forEach((player) => {
+        const item = document.createElement('div');
+        item.className = `roster-item${player.winner ? ' winner' : ''}`;
+        item.textContent = player.winner ? `${player.name} • BINGO` : player.name;
+        rosterEl.appendChild(item);
+      });
+    }
+
+    function renderHistory(draws, targetHistoryEl, targetRemainingEl, targetDrawNumberEl, targetDrawItemEl) {
+      targetHistoryEl.innerHTML = '';
+      draws.forEach((item, index) => {
+        const chip = document.createElement('span');
+        chip.className = 'history-item';
+        chip.textContent = `${index + 1}. ${item}`;
+        targetHistoryEl.appendChild(chip);
+      });
+      targetRemainingEl.textContent = `${Math.max(30 - draws.length, 0)} restantes`;
+      targetDrawNumberEl.textContent = `Sorteio ${draws.length} / 30`;
+      if (draws.length) {
+        targetDrawItemEl.textContent = draws[draws.length - 1];
+        targetDrawItemEl.classList.remove('empty');
+      } else {
+        targetDrawItemEl.textContent = 'Aguardando sorteio';
+        targetDrawItemEl.classList.add('empty');
+      }
+    }
+
+    function renderState(nextState) {
+      state = nextState;
+      if (!session) return;
+      const role = session.role;
+      const drawnSet = new Set(state.draws || []);
+      const me = (state.players || []).find((player) => player.id === session.clientId);
+      const myCard = me && me.card ? me.card : state.myCard || [];
+
+      if (role === 'host') {
+        lobbyView.classList.add('hidden');
+        selectionView.classList.add('hidden');
+        hostView.classList.remove('hidden');
+        playerView.classList.add('hidden');
+
+        roomCodeEl.textContent = state.roomCode;
+        roomPeopleEl.textContent = `${state.playerCount} / 40 participantes`;
+        renderQrCode(state.roomCode);
+        renderRoster(state.players || []);
+        gameStatus.textContent = state.status === 'playing'
+          ? 'Partida em andamento. Sorteie o próximo EPI.'
+          : state.status === 'finished'
+            ? 'Partida finalizada.'
+            : 'Aguardando todos escolherem a cartela.';
+        drawNumberEl.textContent = `Sorteio ${state.draws.length} / 30`;
+        remainingCountEl.textContent = `${Math.max(30 - state.draws.length, 0)} restantes`;
+        historyEl.innerHTML = '';
+        (state.draws || []).forEach((item, index) => {
+          const chip = document.createElement('span');
+          chip.className = 'history-item';
+          chip.textContent = `${index + 1}. ${item}`;
+          historyEl.appendChild(chip);
+        });
+        if (state.draws && state.draws.length) {
+          drawnItemEl.textContent = state.draws[state.draws.length - 1];
+          drawnItemEl.classList.remove('empty');
+        } else {
+          drawnItemEl.textContent = 'Aguardando partida';
+          drawnItemEl.classList.add('empty');
+        }
+        const participants = (state.players || []).filter((player) => player.id !== session.clientId);
+        const allReady = participants.length === 0 || participants.every((player) => player.ready && player.card && player.card.length === 16);
+        startGameButton.disabled = state.status !== 'lobby' || !allReady;
+        startGameButton.classList.toggle('hidden', state.status === 'playing');
+        drawNextButton.classList.toggle('hidden', state.status !== 'playing');
+        startGameButton.textContent = state.status === 'playing' ? 'Partida em andamento' : 'Iniciar partida';
+      } else {
+        lobbyView.classList.add('hidden');
+        selectionView.classList.toggle('hidden', state.status !== 'lobby');
+        hostView.classList.add('hidden');
+        playerView.classList.remove('hidden');
+
+        playerRoomCodeEl.textContent = state.roomCode;
+        playerRoomPeopleEl.textContent = `${state.playerCount} / 40 participantes`;
+        if (state.status === 'lobby') {
+          setSelectedItems(myCard.length ? myCard : selectedItems);
+          selectionStatus.textContent = myCard.length ? 'Cartela salva. Espere o organizador iniciar.' : 'Selecione 16 EPIs para a sua cartela.';
+          if (myCard.length) {
+            selectionStatus.textContent = 'Sua cartela foi salva. Aguarde o organizador iniciar a partida.';
+          }
+        }
+
+        if (state.status === 'playing' || state.status === 'finished') {
+          renderBoard(myCard || [], new Set(state.draws || []));
+          renderHistory(state.draws || [], playerHistoryEl, playerRemainingCountEl, playerDrawNumberEl, playerPlayedItemEl);
+          playerStatus.textContent = state.status === 'finished'
+            ? (state.winners && state.winners.length ? `${state.winners.join(', ')} venceu` : 'Partida finalizada.')
+            : 'A partida começou. Marque os itens sorteados na sua cartela.';
+          playerStatus.classList.toggle('won', state.status === 'finished');
+        } else {
+          playerStatus.textContent = 'Aguardando o organizador iniciar.';
+          playerStatus.classList.remove('won');
+        }
+      }
+    }
+
+    async function api(path, payload) {
+      const response = await fetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || 'Não foi possível concluir a ação.');
+      }
+      return data;
+    }
+
+    function openSession(result) {
+      session = {
+        roomCode: result.roomCode,
+        clientId: result.clientId,
+        role: result.role
+      };
+      state = result.state;
+      renderState(result.state);
+      if (eventSource) eventSource.close();
+      eventSource = new EventSource(`/api/events?roomCode=${encodeURIComponent(result.roomCode)}&clientId=${encodeURIComponent(result.clientId)}`);
+      eventSource.onmessage = (event) => {
+        const payload = JSON.parse(event.data);
+        renderState(payload);
+      };
+      eventSource.onerror = () => {
+        const statusText = session.role === 'host' ? 'Conexão do host instável.' : 'Conexão instável. Tente recarregar.';
+        if (session.role === 'host') gameStatus.textContent = statusText;
+        else playerStatus.textContent = statusText;
+      };
+    }
+
+    createForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      lobbyStatus.textContent = 'Criando sala...';
+      try {
+        const result = await api('/api/create', {
+          name: document.getElementById('host-name').value.trim()
+        });
+        openSession(result);
+        lobbyStatus.textContent = '';
+      } catch (error) {
+        lobbyStatus.textContent = error.message;
+      }
+    });
+
+    async function submitJoinForm() {
+      const roomCodeInput = document.getElementById('join-code');
+      const params = new URLSearchParams(window.location.search);
+      const hashCode = window.location.hash.replace('#', '').trim().toUpperCase();
+      const urlRoom = (params.get('room') || hashCode || '').trim().toUpperCase();
+      const roomCode = (roomCodeInput.value || urlRoom).trim().toUpperCase();
+
+      if (urlRoom && !roomCodeInput.value) {
+        roomCodeInput.value = urlRoom;
+      }
+
+      if (!roomCode) {
+        lobbyStatus.textContent = 'Informe o código da sala ou use o QR Code da sala.';
+        return;
+      }
+
+      const name = document.getElementById('player-name').value.trim();
+      if (!name) {
+        lobbyStatus.textContent = 'Digite seu nome antes de entrar.';
+        return;
+      }
+
+      lobbyStatus.textContent = 'Entrando na sala...';
+      try {
+        const payload = await api('/api/join', {
+          roomCode,
+          name
+        });
+        openSession(payload);
+        lobbyStatus.textContent = '';
+      } catch (error) {
+        lobbyStatus.textContent = error.message;
+      }
+    }
+
+    joinForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      await submitJoinForm();
+    });
+
+    document.getElementById('save-card').addEventListener('click', async () => {
+      if (selectedItems.length !== 16) {
+        selectionStatus.textContent = 'Selecione exatamente 16 EPIs antes de salvar.';
+        return;
+      }
+      try {
+        const response = await api('/api/select-card', {
+          roomCode: session.roomCode,
+          clientId: session.clientId,
+          card: selectedItems
+        });
+        state = response.state;
+        renderState(state);
+        selectionStatus.textContent = 'Cartela salva com sucesso!';
+      } catch (error) {
+        selectionStatus.textContent = error.message;
+      }
+    });
+
+    document.getElementById('leave-room').addEventListener('click', () => {
+      if (eventSource) eventSource.close();
+      session = null;
+      state = null;
+      selectedItems = [];
+      lobbyView.classList.remove('hidden');
+      selectionView.classList.add('hidden');
+      hostView.classList.add('hidden');
+      playerView.classList.add('hidden');
+      createForm.reset();
+      joinForm.reset();
+      lobbyStatus.textContent = 'Você saiu da sala.';
+    });
+
+    document.getElementById('share-room').addEventListener('click', async () => {
+      const link = await getShareLink(session.roomCode);
+      try {
+        await navigator.clipboard.writeText(link);
+        gameStatus.textContent = 'Link da sala copiado.';
+      } catch {
+        window.prompt('Copie o link da sala:', link);
+      }
+    });
+
+    document.getElementById('open-qr-screen').addEventListener('click', async () => {
+      if (!session) return;
+      const modal = document.getElementById('qr-modal');
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      await renderQrCode(session.roomCode, 'qr-modal-box');
+    });
+
+    document.getElementById('close-qr-modal').addEventListener('click', () => {
+      const modal = document.getElementById('qr-modal');
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+    });
+
+    document.getElementById('qr-modal').addEventListener('click', (event) => {
+      if (event.target.id === 'qr-modal') {
+        document.getElementById('qr-modal').classList.add('hidden');
+        document.getElementById('qr-modal').setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    startGameButton.addEventListener('click', async () => {
+      if (!session || session.role !== 'host') return;
+      try {
+        await api('/api/start', { roomCode: session.roomCode, clientId: session.clientId });
+      } catch (error) {
+        gameStatus.textContent = error.message;
+      }
+    });
+
+    drawNextButton.addEventListener('click', async () => {
+      if (!session || session.role !== 'host') return;
+      try {
+        await api('/api/draw', { roomCode: session.roomCode, clientId: session.clientId });
+      } catch (error) {
+        gameStatus.textContent = error.message;
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderChoices();
+      const params = new URLSearchParams(window.location.search);
+      const roomFromQuery = params.get('room');
+      const hash = window.location.hash.replace('#', '').trim().toUpperCase();
+      const roomCode = (roomFromQuery || hash || '').trim().toUpperCase();
+      if (roomCode) {
+        const codeInput = document.getElementById('join-code');
+        codeInput.value = roomCode;
+        const codeField = document.getElementById('join-code-field');
+        if (codeField) {
+          codeField.classList.add('hidden');
+        }
+        codeInput.setAttribute('aria-hidden', 'true');
+        codeInput.style.display = 'none';
+      }
+
+      const playerName = document.getElementById('player-name');
+      playerName.addEventListener('input', () => {
+        if (roomCode && playerName.value.trim() && !lobbyStatus.textContent.includes('Entrando')) {
+          submitJoinForm();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

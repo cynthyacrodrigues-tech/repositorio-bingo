@@ -1,0 +1,12 @@
+{
+  "name": "bingo-epi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bingo EPI com seleção individual de cartela e salas para até 40 participantes",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  }
+}
